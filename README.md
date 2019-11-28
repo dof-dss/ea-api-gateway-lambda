@@ -1,7 +1,7 @@
 # PROJECT NAME 
 
 ## Description
-*A good description is clear, short, and to the point. Describe the importance of your project, and what it does.*
+*.NET Core Lambda function to manage API gateway for Development Portal.*
 
 ## Contents of this file
 
