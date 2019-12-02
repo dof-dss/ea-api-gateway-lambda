@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 
 namespace ea_api_gateway_lambda
 {
-    public class PutApiGatewayResponse : ApiGatewayResponse
+    public class PutApiGatewayHandler : ApiGatewayHandler
     {
-        public PutApiGatewayResponse(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
+        public PutApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
         {
         }
 

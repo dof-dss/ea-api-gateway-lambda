@@ -23,7 +23,7 @@ namespace ea_api_gateway_lambda
 
         public async Task<APIGatewayProxyResponse> Run(APIGatewayProxyRequest request)
         {
-            return await ApiGatewayResponse.Create(request, _apiGatewayManager).Execute();
+            return await ApiGatewayHandler.Create(request, _apiGatewayManager).Execute();
         }
     }
 }

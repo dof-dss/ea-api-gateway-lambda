@@ -5,9 +5,9 @@ using Contracts;
 
 namespace ea_api_gateway_lambda
 {
-    public class DeleteApiGatewayResponse : ApiGatewayResponse
+    public class DeleteApiGatewayHandler : ApiGatewayHandler
     {
-        public DeleteApiGatewayResponse(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
+        public DeleteApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
         {
         }
 

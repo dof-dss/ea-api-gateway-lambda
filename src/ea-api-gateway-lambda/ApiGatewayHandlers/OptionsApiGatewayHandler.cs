@@ -5,9 +5,9 @@ using Contracts;
 
 namespace ea_api_gateway_lambda
 {
-    public class OptionsApiGatewayResponse : ApiGatewayResponse
+    public class OptionsApiGatewayHandler : ApiGatewayHandler
     {
-        public OptionsApiGatewayResponse(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
+        public OptionsApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
         {
         }
 

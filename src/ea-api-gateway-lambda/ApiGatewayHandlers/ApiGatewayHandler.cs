@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace ea_api_gateway_lambda
 {
-    public abstract class ApiGatewayResponse
+    public abstract class ApiGatewayHandler
     {
         protected IApiGatewayManager ApiGatewayManager;
         protected JsonSerializerSettings JsonSettings { get; set; }
@@ -19,7 +19,7 @@ namespace ea_api_gateway_lambda
 
         public abstract Task<APIGatewayProxyResponse> Execute();
 
-        protected ApiGatewayResponse(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request)
+        protected ApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request)
         {
             ApiGatewayManager = apiGatewayManager;
             Headers = new Dictionary<string, string>
@@ -42,20 +42,20 @@ namespace ea_api_gateway_lambda
             };
         }
 
-        public static ApiGatewayResponse Create(APIGatewayProxyRequest request, IApiGatewayManager apiGatewayManager)
+        public static ApiGatewayHandler Create(APIGatewayProxyRequest request, IApiGatewayManager apiGatewayManager)
         {
             switch (request.HttpMethod)
             {
                 case "OPTIONS":
-                    return new OptionsApiGatewayResponse(apiGatewayManager, request);
+                    return new OptionsApiGatewayHandler(apiGatewayManager, request);
                 case "GET":
-                    return new GetApiGatewayResponse(apiGatewayManager, request);
+                    return new GetApiGatewayHandler(apiGatewayManager, request);
                 case "POST":
-                    return new PostApiGatewayResponse(apiGatewayManager, request);
+                    return new PostApiGatewayHandler(apiGatewayManager, request);
                 case "PUT":
-                    return new PutApiGatewayResponse(apiGatewayManager, request);
+                    return new PutApiGatewayHandler(apiGatewayManager, request);
                 case "DELETE":
-                    return new DeleteApiGatewayResponse(apiGatewayManager, request);
+                    return new DeleteApiGatewayHandler(apiGatewayManager, request);
                 default:
                     throw new NotImplementedException($"Http {request.HttpMethod} not implemented ");
             }
