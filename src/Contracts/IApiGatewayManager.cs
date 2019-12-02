@@ -8,11 +8,11 @@ namespace Contracts
 {
     public interface IApiGatewayManager
     {
-        Task<object> GetAllApis();
+        Task<IEnumerable<ApiOverviewModel>> GetAllApis();
         Task<object> GetOpenApi(string apiId, string stage, string exportType);
         Task<object> GetUsagePlans();
         Task<string> Subscribe(SubscriptionModel subscriptionModel);
-        Task<object> GetApiDocumentation(string apiId);
+        Task<DocumentModel> GetApiDocumentation(string apiId);
         Task<SDKModel> GetSdk(string apiId, string stage, string sdkType);
     }
 }

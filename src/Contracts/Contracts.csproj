@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.APIGateway" Version="3.3.2" />
+    <PackageReference Include="AWSSDK.APIGateway" Version="3.3.103.29" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.1.0" />
   </ItemGroup>
 

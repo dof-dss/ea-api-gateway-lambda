@@ -26,17 +26,17 @@ namespace Domain
         public ApiGatewayManager(IAmazonAPIGateway amazonApiGateway) =>
             _amazonApiGatewayClient = amazonApiGateway;
 
-        public async Task<object>  GetAllApis()
+        public async Task<IEnumerable<ApiOverviewModel>>  GetAllApis()
         {
             var result = await _amazonApiGatewayClient.GetRestApisAsync(new GetRestApisRequest()
             {
                 Limit = 100
             }, CancellationToken.None);
 
-            return result.Items.Select(x => new
+            return result.Items.Select(x => new ApiOverviewModel
             {
-                id = x.Id, 
-                name = x.Name,
+                Id = x.Id, 
+                Name = x.Name,
                 Description = GetDescription(x.Id)
             });
         }
@@ -54,7 +54,7 @@ namespace Domain
             return properties != null ? JsonConvert.DeserializeObject<DocumentModel>(properties).Description : null;
         }
 
-        public async Task<object> GetApiDocumentation(string apiId)
+        public async Task<DocumentModel> GetApiDocumentation(string apiId)
         {
             var result = await _amazonApiGatewayClient.GetDocumentationPartsAsync(new GetDocumentationPartsRequest
             {
@@ -69,7 +69,7 @@ namespace Domain
 
         public async Task<object> GetUsagePlans()
         {
-            var result = await _amazonApiGatewayClient.GetUsagePlansAsync(new GetUsagePlansRequest()
+            GetUsagePlansResponse result = await _amazonApiGatewayClient.GetUsagePlansAsync(new GetUsagePlansRequest()
             {
                 Limit = 100
             }, CancellationToken.None);
@@ -157,12 +157,6 @@ namespace Domain
                 KeyId = keyId,
                 UsagePlanId = usagePlanId
             });
-        }
-
-        private class DocumentModel
-        {
-            public string Description { get; set; }
-            public string Overview { get; set; }
         }
     }
 }
