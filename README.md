@@ -1,4 +1,4 @@
-# PROJECT NAME 
+# EA API Gateway Lambda
 
 ## Description
 *.NET Core Lambda function to manage API gateway for Development Portal.*
