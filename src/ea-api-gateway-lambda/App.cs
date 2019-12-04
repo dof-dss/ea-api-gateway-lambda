@@ -14,16 +14,13 @@ namespace ea_api_gateway_lambda
 {
     public class App
     {
-        private readonly IApiGatewayManager _apiGatewayManager;
+        private readonly IApiGatewayHandlerFactory _apiGatewayHandlerFactory;
 
-        public App(IApiGatewayManager apiGatewayManager)
-        {
-            _apiGatewayManager = apiGatewayManager;
-        }
+        public App(IApiGatewayHandlerFactory apiGatewayHandlerFactory) 
+            => _apiGatewayHandlerFactory = apiGatewayHandlerFactory;
 
-        public async Task<APIGatewayProxyResponse> Run(APIGatewayProxyRequest request)
-        {
-            return await ApiGatewayHandler.Create(request, _apiGatewayManager).Execute();
-        }
+        public async Task<APIGatewayProxyResponse> Run(APIGatewayProxyRequest request) =>
+            await _apiGatewayHandlerFactory.Create(request).Execute();
+
     }
 }

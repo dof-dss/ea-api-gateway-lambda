@@ -10,14 +10,25 @@ using Newtonsoft.Json.Serialization;
 
 namespace ea_api_gateway_lambda
 {
-    public abstract class ApiGatewayHandler
+    public interface IApiGatewayHandler
+    {
+        Task<APIGatewayProxyResponse> Execute();
+    }
+
+    public abstract class ApiGatewayHandler : IApiGatewayHandler
     {
         protected IApiGatewayManager ApiGatewayManager;
         protected JsonSerializerSettings JsonSettings { get; set; }
         protected Dictionary<string, string> Headers { get; set; }
         protected APIGatewayProxyRequest Request { get; set; }
+        protected IDictionary<string, Func<Task<APIGatewayProxyResponse>>> GatewayFunctionMapper;
 
-        public abstract Task<APIGatewayProxyResponse> Execute();
+        public virtual async Task<APIGatewayProxyResponse> Execute()
+        {
+            return GatewayFunctionMapper.ContainsKey(Request.Resource) ?
+                await GatewayFunctionMapper[Request.Resource]()
+                : throw new NotImplementedException($"Http {Request.Resource} not implemented ");
+        }
 
         protected ApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request)
         {
@@ -30,6 +41,7 @@ namespace ea_api_gateway_lambda
             };
             JsonSettings = new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
             Request = request;
+            GatewayFunctionMapper = new Dictionary<string, Func<Task<APIGatewayProxyResponse>>>();
         }
 
         protected APIGatewayProxyResponse GetAPIGatewayResponse(HttpStatusCode statusCode, object responseContent)
@@ -40,25 +52,6 @@ namespace ea_api_gateway_lambda
                 StatusCode = (int)statusCode,
                 Body = JsonConvert.SerializeObject(responseContent, JsonSettings)
             };
-        }
-
-        public static ApiGatewayHandler Create(APIGatewayProxyRequest request, IApiGatewayManager apiGatewayManager)
-        {
-            switch (request.HttpMethod)
-            {
-                case "OPTIONS":
-                    return new OptionsApiGatewayHandler(apiGatewayManager, request);
-                case "GET":
-                    return new GetApiGatewayHandler(apiGatewayManager, request);
-                case "POST":
-                    return new PostApiGatewayHandler(apiGatewayManager, request);
-                case "PUT":
-                    return new PutApiGatewayHandler(apiGatewayManager, request);
-                case "DELETE":
-                    return new DeleteApiGatewayHandler(apiGatewayManager, request);
-                default:
-                    throw new NotImplementedException($"Http {request.HttpMethod} not implemented ");
-            }
         }
     }
 }

@@ -11,8 +11,10 @@ namespace Contracts
         Task<IEnumerable<ApiOverviewModel>> GetAllApis();
         Task<object> GetOpenApi(string apiId, string stage, string exportType);
         Task<object> GetUsagePlans();
+        Task<object> GetUsage(string keyId, string usagePlanId);
         Task<string> Subscribe(SubscriptionModel subscriptionModel);
         Task<DocumentModel> GetApiDocumentation(string apiId);
         Task<SDKModel> GetSdk(string apiId, string stage, string sdkType);
+        Task<IEnumerable<ApiKeyModel>> GetApiKeys(string identityId);
     }
 }

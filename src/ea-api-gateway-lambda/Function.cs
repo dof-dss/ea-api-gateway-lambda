@@ -52,6 +52,7 @@ namespace ea_api_gateway_lambda
             _serviceCollection.AddScoped<IAmazonAPIGateway, AmazonAPIGatewayClient>
                 (provider => new AmazonAPIGatewayClient(accessKey, secretKey));
             _serviceCollection.AddScoped<IApiGatewayManager, ApiGatewayManager>();
+            _serviceCollection.AddScoped<IApiGatewayHandlerFactory, ApiGatewayHandlerFactory>();
 
             _serviceProvider = _serviceCollection.BuildServiceProvider();
         }

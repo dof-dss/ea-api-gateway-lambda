@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -77,6 +78,19 @@ namespace Domain
             return result.Items;
         }
 
+        public async Task<object> GetUsage(string keyId, string usagePlanId)
+        {
+            var result = await _amazonApiGatewayClient.GetUsageAsync(new GetUsageRequest()
+            {
+                KeyId = keyId,
+                UsagePlanId = usagePlanId,
+                StartDate = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"),
+                EndDate = DateTime.Now.AddDays(1).ToString( "yyyy-MM-dd")
+            }, CancellationToken.None);
+
+            return result.Items;
+        }
+
         public async Task<object> GetOpenApi(string apiId, string stage, string exportType)
         {
             var result = await _amazonApiGatewayClient.GetExportAsync(new GetExportRequest
@@ -117,6 +131,24 @@ namespace Domain
             var createApiKeyResponse = await CreateApiKeyRequest(subscriptionModel.IdentityId);
             await CreateUsagePlanKey(createApiKeyResponse.Id, subscriptionModel.UsagePlanId);
             return createApiKeyResponse.Value;
+        }
+
+        public async Task<IEnumerable<ApiKeyModel>> GetApiKeys(string identityId)
+        {
+            var getApiKeysResponse = await GetApiKeysRequest(identityId);
+
+            return getApiKeysResponse.Items.Any()
+                ? getApiKeysResponse.Items.Select(k => new ApiKeyModel
+                {
+                    Id = k.Id,
+                    Value = k.Value,
+                    CustomerId = k.CustomerId,
+                    CreatedDate = k.CreatedDate,
+                    LastUpdatedDate = k.LastUpdatedDate,
+                    Enabled = k.Enabled,
+                    Description = k.Description
+                })
+                : new List<ApiKeyModel>();
         }
 
         private Task<GetApiKeysResponse> GetApiKeysRequest(string identityId)

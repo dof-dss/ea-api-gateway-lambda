@@ -12,19 +12,15 @@ namespace ea_api_gateway_lambda
     {
         public PutApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
         {
+            GatewayFunctionMapper.Add("/subscribe", Subscribe);
         }
 
-        public override async Task<APIGatewayProxyResponse> Execute()
+        private async Task<APIGatewayProxyResponse> Subscribe()
         {
-            switch (Request.Resource)
-            {
-                case "/subscribe":
-                    var subscriptionModel = JsonConvert.DeserializeObject<SubscriptionModel>(Request.Body);
-                    return GetAPIGatewayResponse(HttpStatusCode.Created,
-                        await ApiGatewayManager.Subscribe(subscriptionModel));
-                default:
-                    throw new NotImplementedException($"Http {Request.Resource} not implemented ");
-            }
+            var subscriptionModel = JsonConvert.DeserializeObject<SubscriptionModel>(Request.Body);
+            return GetAPIGatewayResponse(HttpStatusCode.Created,
+                await ApiGatewayManager.Subscribe(subscriptionModel));
         }
+
     }
 }
