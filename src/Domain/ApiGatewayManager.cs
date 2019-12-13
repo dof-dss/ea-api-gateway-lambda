@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon;
 using Amazon.APIGateway;
 using Amazon.APIGateway.Model;
-using Aws4RequestSigner;
 using Common;
 using Common.Models;
 using Contracts;
@@ -29,12 +21,12 @@ namespace Domain
 
         public async Task<IEnumerable<ApiOverviewModel>>  GetAllApis()
         {
-            var result = await _amazonApiGatewayClient.GetRestApisAsync(new GetRestApisRequest()
+            GetRestApisResponse result = await _amazonApiGatewayClient.GetRestApisAsync(new GetRestApisRequest()
             {
                 Limit = 100
             }, CancellationToken.None);
 
-            return result.Items.Select(x => new ApiOverviewModel
+            return result.Items.Where(i => i.Tags.ContainsKey("demo")).Select(x => new ApiOverviewModel
             {
                 Id = x.Id, 
                 Name = x.Name,
@@ -84,8 +76,8 @@ namespace Domain
             {
                 KeyId = keyId,
                 UsagePlanId = usagePlanId,
-                StartDate = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"),
-                EndDate = DateTime.Now.AddDays(1).ToString( "yyyy-MM-dd")
+                StartDate = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"),
+                EndDate = DateTime.Now.ToString( "yyyy-MM-dd")
             }, CancellationToken.None);
 
             return result.Items;
