@@ -50,7 +50,7 @@ namespace ea_api_gateway_lambda
             {
                 Headers = this.Headers,
                 StatusCode = (int)statusCode,
-                Body = JsonConvert.SerializeObject(responseContent, JsonSettings)
+                Body = responseContent != null ? JsonConvert.SerializeObject(responseContent, JsonSettings) : string.Empty
             };
         }
     }
