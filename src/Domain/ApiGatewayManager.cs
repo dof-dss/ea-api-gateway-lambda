@@ -5,19 +5,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.APIGateway;
 using Amazon.APIGateway.Model;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Common;
 using Common.Models;
 using Contracts;
 using Newtonsoft.Json;
+using WebPush;
 
 namespace Domain
 {
     public class ApiGatewayManager: IApiGatewayManager
     {
-        private readonly IAmazonAPIGateway _amazonApiGatewayClient;
+        public IEnumerable<ScanCondition> Conditions { get; set; } = new List<ScanCondition>();
 
-        public ApiGatewayManager(IAmazonAPIGateway amazonApiGateway) =>
+        private readonly IAmazonAPIGateway _amazonApiGatewayClient;
+        private IDynamoDBContext _dynamoDbContext;
+        private WebPushClient _webPushClient;
+
+        public ApiGatewayManager(IAmazonAPIGateway amazonApiGateway, IDynamoDBContext dynamoDbContext, WebPushClient webPushClient)
+        {
             _amazonApiGatewayClient = amazonApiGateway;
+            _dynamoDbContext = dynamoDbContext;
+            _webPushClient = webPushClient;
+        }
 
         public async Task<IEnumerable<ApiOverviewModel>>  GetAllApis()
         {
@@ -141,6 +152,34 @@ namespace Domain
                     Description = k.Description
                 })
                 : new List<ApiKeyModel>();
+        }
+
+        public async Task<PushSubscriptionTable> PushSubscribe(PushSubscriptionModel pushSubscriptionModel)
+        {
+            var item = new PushSubscriptionTable
+            {
+                Id = Guid.NewGuid().ToString(),
+                PushSubscription = JsonConvert.SerializeObject( pushSubscriptionModel)
+            };
+            await _dynamoDbContext.SaveAsync(item);
+            return item;
+        }
+
+        public async Task<string> SendPush(string payload)
+        {
+            var allSubscriptions =
+                await _dynamoDbContext.ScanAsync<PushSubscriptionTable>(Conditions).GetRemainingAsync();
+
+            foreach (var subscription in allSubscriptions)
+            {
+                var pushNotificationModel =
+                    JsonConvert.DeserializeObject<PushSubscriptionModel>(subscription.PushSubscription);
+                var pushSubscription = new PushSubscription(pushNotificationModel.Endpoint, pushNotificationModel.Keys.P256dh, pushNotificationModel.Keys.Auth);
+
+                await _webPushClient.SendNotificationAsync(pushSubscription, payload);
+            }
+
+            return payload;
         }
 
         private Task<GetApiKeysResponse> GetApiKeysRequest(string identityId)

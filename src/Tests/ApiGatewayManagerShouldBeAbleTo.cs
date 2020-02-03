@@ -9,10 +9,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.APIGateway;
 using Amazon.APIGateway.Model;
+using Amazon.DynamoDBv2.DataModel;
 using Contracts;
 using Domain;
 using Moq;
 using NUnit.Framework;
+using WebPush;
 
 namespace Tests
 {
@@ -21,12 +23,17 @@ namespace Tests
     {
         private IApiGatewayManager _apiGatewayManager;
         private Mock<IAmazonAPIGateway> _amazonApiGatewayMock;
+        private Mock<IDynamoDBContext> _amazonDynamoDbContextMock;
+        private Mock<WebPushClient> _webPushClient;
 
         [SetUp]
         public void SetUp()
         {
             _amazonApiGatewayMock = new Mock<IAmazonAPIGateway>();
-            _apiGatewayManager = new ApiGatewayManager(_amazonApiGatewayMock.Object);
+            _amazonDynamoDbContextMock = new Mock<IDynamoDBContext>();
+            _webPushClient = new Mock<WebPushClient>();
+
+            _apiGatewayManager = new ApiGatewayManager(_amazonApiGatewayMock.Object, _amazonDynamoDbContextMock.Object, _webPushClient.Object);
         }
 
         [Test]

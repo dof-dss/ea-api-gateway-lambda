@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.APIGateway;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Contracts;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using WebPush;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -51,10 +54,29 @@ namespace ea_api_gateway_lambda
             _serviceCollection.AddTransient<App>();
             _serviceCollection.AddScoped<IAmazonAPIGateway, AmazonAPIGatewayClient>
                 (provider => new AmazonAPIGatewayClient(accessKey, secretKey));
+            _serviceCollection.AddScoped<IDynamoDBContext, DynamoDBContext>
+                (provider =>
+                {
+                    var amazonDynamoDbClient = new AmazonDynamoDBClient(accessKey, secretKey, RegionEndpoint.EUWest2);
+                    return new DynamoDBContext(amazonDynamoDbClient);
+                });
+            _serviceCollection.AddScoped<WebPushClient, WebPushClient>(provider => CreateWebPushClient());
             _serviceCollection.AddScoped<IApiGatewayManager, ApiGatewayManager>();
             _serviceCollection.AddScoped<IApiGatewayHandlerFactory, ApiGatewayHandlerFactory>();
 
             _serviceProvider = _serviceCollection.BuildServiceProvider();
+        }
+
+        private WebPushClient CreateWebPushClient()
+        {
+            var vapidPublicKey = Environment.GetEnvironmentVariable("vapidPublicKey");
+            var vapidPrivateKey = Environment.GetEnvironmentVariable("vapidPrivateKey");
+            var vapidDetails = new VapidDetails("mailto:example@example.com", vapidPublicKey, vapidPrivateKey);
+
+            var webPushClient = new WebPushClient();
+            webPushClient.SetVapidDetails(vapidDetails);
+
+            return webPushClient;
         }
 
         ~Function()
