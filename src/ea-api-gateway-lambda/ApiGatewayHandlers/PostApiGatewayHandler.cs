@@ -11,21 +11,10 @@ namespace ea_api_gateway_lambda
     {
         public PostApiGatewayHandler(IApiGatewayManager apiGatewayManager, APIGatewayProxyRequest request) : base(apiGatewayManager, request)
         {
-            GatewayFunctionMapper.Add("/push/subscribe", SubscribePush);
-            GatewayFunctionMapper.Add("/push", Push);
         }
-
-        private async Task<APIGatewayProxyResponse> Push()
+        public override async Task<APIGatewayProxyResponse> Execute()
         {
-            return GetAPIGatewayResponse(HttpStatusCode.Created,
-                await ApiGatewayManager.SendPush(Request.Body));
-        }
-
-        private async Task<APIGatewayProxyResponse> SubscribePush()
-        {
-            var pushSubscriptionModel = JsonConvert.DeserializeObject<PushSubscriptionModel>(Request.Body);
-            return GetAPIGatewayResponse(HttpStatusCode.Created,
-                await ApiGatewayManager.PushSubscribe(pushSubscriptionModel));
+            return GetAPIGatewayResponse(HttpStatusCode.OK, string.Empty);
         }
     }
 }

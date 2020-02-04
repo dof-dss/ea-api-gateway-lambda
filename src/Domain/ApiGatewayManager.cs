@@ -154,34 +154,6 @@ namespace Domain
                 : new List<ApiKeyModel>();
         }
 
-        public async Task<PushSubscriptionTable> PushSubscribe(PushSubscriptionModel pushSubscriptionModel)
-        {
-            var item = new PushSubscriptionTable
-            {
-                Id = Guid.NewGuid().ToString(),
-                PushSubscription = JsonConvert.SerializeObject( pushSubscriptionModel)
-            };
-            await _dynamoDbContext.SaveAsync(item);
-            return item;
-        }
-
-        public async Task<string> SendPush(string payload)
-        {
-            var allSubscriptions =
-                await _dynamoDbContext.ScanAsync<PushSubscriptionTable>(Conditions).GetRemainingAsync();
-
-            foreach (var subscription in allSubscriptions)
-            {
-                var pushNotificationModel =
-                    JsonConvert.DeserializeObject<PushSubscriptionModel>(subscription.PushSubscription);
-                var pushSubscription = new PushSubscription(pushNotificationModel.Endpoint, pushNotificationModel.Keys.P256dh, pushNotificationModel.Keys.Auth);
-
-                await _webPushClient.SendNotificationAsync(pushSubscription, payload);
-            }
-
-            return payload;
-        }
-
         private Task<GetApiKeysResponse> GetApiKeysRequest(string identityId)
         {
             return _amazonApiGatewayClient.GetApiKeysAsync(new GetApiKeysRequest

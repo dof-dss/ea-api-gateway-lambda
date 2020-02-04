@@ -16,7 +16,5 @@ namespace Contracts
         Task<DocumentModel> GetApiDocumentation(string apiId);
         Task<SDKModel> GetSdk(string apiId, string stage, string sdkType);
         Task<IEnumerable<ApiKeyModel>> GetApiKeys(string identityId);
-        Task<PushSubscriptionTable> PushSubscribe(PushSubscriptionModel pushSubscriptionModel);
-        Task<string> SendPush(string payload);
     }
 }

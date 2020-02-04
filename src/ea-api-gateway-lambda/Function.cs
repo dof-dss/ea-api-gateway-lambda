@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.APIGateway;
@@ -12,10 +8,7 @@ using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Contracts;
 using Domain;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using WebPush;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
