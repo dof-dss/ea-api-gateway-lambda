@@ -9,7 +9,7 @@
     <PackageReference Include="AWSSDK.APIGateway" Version="3.3.103.29" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.104.17" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WebPush" Version="1.0.11" />
   </ItemGroup>
 
